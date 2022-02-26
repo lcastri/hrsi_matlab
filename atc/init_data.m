@@ -30,8 +30,6 @@ clear g G1 G2 G3 Garray Rarray i
 
 %% human selection
 selected_id = 9360100; %longer
-% id = 9335900; %shorter
-% id = 9351500; %
 
 %% processing and result
 DT = 0.035; % [s]

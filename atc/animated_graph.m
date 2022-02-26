@@ -9,12 +9,10 @@ answer = questdlg('Do you want to make a video?', ...
 switch answer
     case 'Yes'
         makeVideo = true;
-        formatOut = 'dd-mm-yyyy_HH:MM:SS';
-        FileName = string(datestr(now,formatOut)) + '.avi';
-        if ~exist('Video', 'dir')
-            mkdir('Video')
+        if ~exist('video', 'dir')
+            mkdir('video')
         end
-        video = VideoWriter('Video/Path.avi');
+        video = VideoWriter('video/simulation.avi');
         open(video)
         ax = gca();
     otherwise

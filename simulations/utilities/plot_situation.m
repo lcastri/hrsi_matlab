@@ -1,4 +1,11 @@
 function plot_situation(makeVideo, video, bounds, A, t, ax) 
+%plot_situation: plot scenario situation at time t
+% - param makeVideo: (bool) record video bit
+% - param video: video instance
+% - param bounds: (array) boundaries scenario
+% - param A: (struc) struct containing all agents
+% - param t: (int) time step
+% - param ax: (array) axis figure [xmin xmax ymin ymax]
 
     % draw bounds
     line(bounds(:,1), bounds(:,2), 'Color', 'k')

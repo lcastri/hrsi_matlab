@@ -105,10 +105,8 @@ h.set_obs([U{2:end}],1)
 data{1,1}.data = [];
 data{2,1}.data = [];
 data{3,1}.data = [];
-% data{4,1}.data = [];
 data{1,1}.name = "d_g";
 data{2,1}.name = "v";  
-% data{3,1}.name = "risk";  
-data{3,1}.name = "dobs";  
+data{3,1}.name = "risk";  
 
 theta_to_change = false;

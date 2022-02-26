@@ -20,7 +20,7 @@ for t = 2 : length(tout)
                 if current_goal + 1 <= length(Goals_r) + length(Goals_h)
                     current_goal = current_goal + 1;
                 else
-                    current_goal = length(Goals_h)+1;
+                    current_goal = length(Goals_r)+1;
                 end
             end
         end
@@ -29,11 +29,10 @@ for t = 2 : length(tout)
     end
     
     for i = 1 : length(U)   
-%         U{i}.measure_risk(t, noise_risk.values(t));
-
         U{i}.measure_g(t, noise_Dg.values(t), 0);
-        U{i}.measure_obs(t, noise_Dobs.values(t), 0);
-               
+        U{i}.measure_obs(t);
+        U{i}.measure_risk(t, noise_risk.values(t));
+
         %% VELOCITIES
         [Ft, gFt] = U{i}.total_force_field(t);
         
@@ -48,12 +47,6 @@ for t = 2 : length(tout)
                 end
             else
                 U{i}.compute_next_inputs(t, Ft, gFt, noise_v.values(t), 0)
-%                 U{i}.v(t) = U{i}.v(t) - 0.1*U{i}.risk(t-1);
-%                 if U{i}.v(t) > U{i}.max_v
-%                     U{i}.v(t) = U{i}.max_v;
-%                 elseif U{i}.v(t) < -U{i}.max_v
-%                     U{i}.v(t) = -U{i}.max_v;
-%                 end
             end
         else
             U{i}.compute_next_inputs(t, Ft, gFt)
@@ -62,13 +55,12 @@ for t = 2 : length(tout)
     end
     
     %% PLOT CURRENT STATE
-%     plot_situation(false, 0, Boundaries, [G; U], t, axis_def)
+%      plot_situation(false, 0, Boundaries, [G; U], t, axis_def)
     
     %% DATA
     data{1,1}.data(end+1,1) = U{1}.d_a(t, U{1}.g_seq(t));
     data{2,1}.data(end+1,1) = U{1}.v(t);
     data{3,1}.data(end+1,1) = U{1}.risk(t);
-%     data{3,1}.data(end+1,1) = U{1}.dobs(t);
 
 end
 end_fnc;

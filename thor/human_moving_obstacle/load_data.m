@@ -51,10 +51,7 @@ eta_0 = 1.50; % [m]
 
 %% Data processing
 waitbar(counter/tot, hw, sprintf('Data processing: %d %%', floor(counter/tot*100)));
-data_processing_risk;
-% data_processing_dobs;
-% data_processing_vobs;
-% data_processing_w;
+data_processing;
 counter = counter + 1;
 
 waitbar(counter/tot, hw, sprintf('NaN handling: %d %%', floor(counter/tot*100)));

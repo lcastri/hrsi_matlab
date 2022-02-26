@@ -9,19 +9,17 @@ switch answer
         dims = [1 35];
         FileName = string(inputdlg(prompt,dlgtitle,dims));
         
-        ex_path = '/home/luca/Git/CausalInference/simulation/' + FileName;
-        if ~exist(ex_path, 'dir')
-            mkdir(ex_path)
+        if ~exist(FileName, 'dir')
+            mkdir(FileName)
         end
         %% save .mat
-        save(ex_path + '/data')
+        save(FileName + '/data')
 
         %% save .csv
         T = table(H(selected_id).theta_gh', H(selected_id).d', abs(H(selected_id).v/1000)');
         T.Properties.VariableNames = {'theta_gh', 'Dgh', 'V_h'};
-        writetable(T, ex_path + '/data.csv')
-        clear T FileName
-        
+        writetable(T, FileName + '/data.csv')
+                
         %% README creation
         create_readme;
 end

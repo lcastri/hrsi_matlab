@@ -16,10 +16,30 @@ classdef Unicycle < Agent
         obs
         L
         risk
+        collision
     end
     
-    methods
+    methods (Access=public)
         function obj = Unicycle(id, color, Ka, Kr, eta_0, x, y, theta, tout, rep_force_type, n_agent, L, sat_op, max_v, task_op, Kv, Kw)
+            %Unicycle: class constructor
+            % - param id: (integer) number associated to this agent
+            % - param color: (char) color associated to this agent (example 'k', 'r')
+            % - param Ka: (float) attractive gain
+            % - param Kr: (float) repulsive gain
+            % - param eta_0: (float) minimum distance from obstacles
+            % - param x: (float) initial pos-x
+            % - param y: (float) initial pos-y
+            % - param theta: (float) initial orientation
+            % - param tout: (array) time vector
+            % - param n_agent: (int) number of agent in the scenario
+            % - param L: (float) length orientation arrow
+            % - param sat_op: (bool) velocity saturation option
+            % - param max_v: (float) max velocity (active only if sat_op = True)
+            % - param task_op: (bool) task option
+            % - param Kv: (float) linear velocity gain
+            % - param Kw: (float) angular velocity gain
+            
+            % parent constructor
             obj@Agent(id, color, Ka, Kr, eta_0, x, y, theta, tout, rep_force_type);
             obj.x = zeros(length(tout),1);
             obj.y = zeros(length(tout),1);
@@ -47,6 +67,7 @@ classdef Unicycle < Agent
         end
 
         function draw(obj, t)
+            % draw: Draw unicycle as a point and an arrow.
             
             % draw position
             plot(obj.x(t), obj.y(t), '.', 'MarkerSize', 35, 'Color', obj.color)
@@ -72,27 +93,62 @@ classdef Unicycle < Agent
         end
         
         function set_obs(obj, obs, t)
+            %set_obs: Set an agent as obstacle
+            % - param obs: (agent) agent to set as obstacle for this agent
+
             obj.obs = obs;
             if t == 1
                 obj.measure_obs(t)
             end
         end
         
-
+        function obs = get_closest_obs(obj, t)
+            %get_closest_obs: return the closest obstacle
+            % - param t: (int) time step
+            % - return obs: (agent) closest obstacle
+            
+            n_goals = size(obj.d_a,2) - length(obj.obs);
+            d_obs = obj.d_a(t, n_goals + 1 : end);
+            [~, min_index] = min(d_obs);
+            obs = obj.obs(min_index);
+        end
+        
         function measure_risk(obj, t, varargin)
+            %measure_risk: measure risk by cone analysis
+            % - param t: (int) time step
+            % - param varargin: [optional] (float) risk noise
+
             minArgs = 2;
             noise_risk = 0;
             if nargin > minArgs
                 noise_risk = varargin{1};
             end
-            % TODO
-            % velocity obstacle strategy and risk evaluation based on
-            % relative velocity between selected agent and the closest
-            % obstacle at time t
-
+            obj.risk(t) = exp(obj.v(t-1));
+            
+            if ~isempty(obj.obs)
+%                 o = obj.get_closest_obs(t);
+                tmp_risk = 0;
+                tmp_col = zeros(size(obj.obs));
+                col_index = 1;
+                for o = obj.obs
+                    if obj.d_a(t-1, o.id) < obj.eta_0
+                        [col, r] = obj.build_cone(o, t);
+                        tmp_risk = tmp_risk + r;
+                        tmp_col(col_index) = col;
+                    end
+                    col_index = col_index + 1;
+                end
+                obj.collision = tmp_col;
+                obj.risk(t) = obj.risk(t) + exp(tmp_risk) + noise_risk;
+            end
         end
 
         function measure_obs(obj, t, varargin)
+            %measure_obs: wrap function for range_obs and bearing_obs
+            % - param t: (int) time step
+            % - param varargin1: [optional] (float) range noise
+            % - param varargin2: [optional] (float) bearing noise
+
             minArgs = 2;
             noise_range = 0;
             noise_bearing = 0;
@@ -107,6 +163,11 @@ classdef Unicycle < Agent
         end
 
         function measure_g(obj, t, varargin)
+            %measure_g: wrap function for range_g and bearing_g
+            % - param t: (int) time step
+            % - param varargin1: [optional] (float) range noise
+            % - param varargin2: [optional] (float) bearing noise
+            
             minArgs = 2;
             noise_range = 0;
             noise_bearing = 0;
@@ -119,6 +180,10 @@ classdef Unicycle < Agent
         end
 
         function set_goal(obj, goal, t)
+            %set_goal: set position goal (agent)
+            % - param goal: (agent) agent to reach
+            % - param t: (int) time step
+            
             obj.g_seq(t) = goal.id;
             obj.g = goal;
             if t == 1
@@ -126,86 +191,22 @@ classdef Unicycle < Agent
             end
         end
         
-        function range_g(obj, t, varargin)
-            minArgs = 2;
-            noise = 0;
-            if nargin > minArgs
-                noise = varargin{1};
-            end
-            obj.d_a(t, obj.g_seq(t)) = sqrt((obj.g.x(t) - obj.x(t))^2 + (obj.g.y(t) - obj.y(t))^2) + noise;
-        end
-
-        function bearing_g(obj, t, varargin)
-            minArgs = 2;
-            noise = 0;
-            if nargin > minArgs
-                noise = varargin{1};
-            end
-            obj.theta_a(t, obj.g_seq(t)) = atan2(obj.g.y(t) - obj.y(t), obj.g.x(t) - obj.x(t)) + noise;
-        end
-
-        function range_obs(obj, t, obs, varargin)
-            minArgs = 3;
-            noise = 0;
-            if nargin > minArgs
-                noise = varargin{1};
-            end
-            obj.d_a(t, obs.id) = sqrt((obj.x(t) - obs.x(t))^2 + (obj.y(t) - obs.y(t))^2) + noise;
-        end
-
-        function bearing_obs(obj, t, obs, varargin)
-            minArgs = 3;
-            noise = 0;
-            if nargin > minArgs
-                noise = varargin{1};
-            end
-            obj.theta_a(t, obs.id) = atan2(obj.y(t) - obs.y(t), obj.x(t) - obs.x(t)) + noise;
-        end
-
         function compute_next_state(obj, t, DT)
+            %compute_next_state: compute next state x,y,theta
+            % - param t: (int) time step
+            % - param DT: (float) delta time
+            
             obj.x(t) = obj.x(t-1) + DT*obj.v(t-1)*cos(obj.theta(t-1));
             obj.y(t) = obj.y(t-1) + DT*obj.v(t-1)*sin(obj.theta(t-1));
             obj.theta(t) = obj.theta(t-1) + DT*obj.w(t-1);
         end
 
-        function [Fa, gFa] = goal_force(obj, t)
-            [dx_gh, dy_gh] = dxdy(obj.d_a(t-1, obj.g_seq(t-1)), obj.theta_a(t-1, obj.g_seq(t-1)));
-            Fa = attractive_force(obj.g.Ka, dx_gh, dy_gh);
-            gFa = attractive_gradient(obj.g.Ka);
-        end
-
-        function [Fr, gFr] = obs_force(obj, t, obs)
-            Fr = [0 0];
-            gFr = [0 0; 0 0];
-            [dx_hh, dy_hh] = dxdy(obj.d_a(t-1, obs.id), obj.theta_a(t-1, obs.id));
-
-            if obj.d_a(t-1, obs.id) < obs.eta_0
-                obj.interaction(t, obs.id) = true;
-                switch obs.rep_force_type
-                    case Rep_force.REPULSIVE
-                        Fr = repulsive_force(obs.Kr, dx_hh, dy_hh);
-                        gFr = repulsive_gradient(obs.Kr, dx_hh, dy_hh);
-                    case Rep_force.VORTEX
-                        Fr =  vortex_force(obs.Kr, dx_hh, dy_hh);
-                        gFr = vortex_gradient(obs.Kr, dx_hh, dy_hh);
-                end
-            end
-        end
-
-        function [Ft, gFt] = total_force_field(obj, t)
-            Fr = [0 0];
-            gFr = [0 0; 0 0];
-            [Fa, gFa] = obj.goal_force(t);
-            for o = obj.obs
-                [Fr_o, gFr_o] = obj.obs_force(t, o);
-                Fr = Fr + Fr_o;
-                gFr = gFr + gFr_o;
-            end
-            Ft = Fa + Fr;
-            gFt = gFa + gFr;
-        end
-
         function compute_v(obj, t, Ft, varargin)
+            %compute_v: compute new linear velocity
+            % - param t: (int) time step
+            % - param Ft: (float) total force
+            % - param varargin: [optional] (float) linear velocity noise
+            
             minArgs = 3;
             noise = 0;
             if nargin > minArgs
@@ -229,6 +230,12 @@ classdef Unicycle < Agent
         end
 
         function compute_w(obj, t, Ft, gFt, varargin)
+            %compute_w: compute new angular velocity
+            % - param t: (int) time step
+            % - param Ft: (float) total force
+            % - param gFt: (float) gradient of total force
+            % - param varargin: [optional] (float) angular velocity noise
+            
             minArgs = 4;
             noise = 0;
             if nargin > minArgs
@@ -258,6 +265,14 @@ classdef Unicycle < Agent
         end
         
         function compute_next_inputs(obj, t, Ft, gFt, varargin)
+            %compute_w: wrap function for compute_v and compute_w
+            % - param t: (int) time step
+            % - param Ft: (float) total force
+            % - param gFt: (float) gradient of total force
+            % - param varargin1: [optional] (float) linear velocity noise
+            % - param varargin2: [optional] (float) angular velocity noise
+
+            
             minArgs = 4;
             noise = [0 0];
             if nargin > minArgs
@@ -268,6 +283,165 @@ classdef Unicycle < Agent
             obj.compute_w(t, Ft, gFt, noise(2))
         end
         
+        function range_g(obj, t, varargin)
+            %range_g: compute distance to the goal
+            % - param t: (int) time step
+            % - param varargin: [optional] (float) range noise
+
+            minArgs = 2;
+            noise = 0;
+            if nargin > minArgs
+                noise = varargin{1};
+            end
+            obj.d_a(t, obj.g_seq(t)) = sqrt((obj.g.x(t) - obj.x(t))^2 + (obj.g.y(t) - obj.y(t))^2) + noise;
+        end
+
+        function bearing_g(obj, t, varargin)
+            %bearing_g: compute angle to the goal
+            % - param t: (int) time step
+            % - param varargin: [optional] (float) bearing noise
+            
+            minArgs = 2;
+            noise = 0;
+            if nargin > minArgs
+                noise = varargin{1};
+            end
+            obj.theta_a(t, obj.g_seq(t)) = atan2(obj.g.y(t) - obj.y(t), obj.g.x(t) - obj.x(t)) + noise;
+        end
+
+        function range_obs(obj, t, obs, varargin)
+            %range_obs: compute distance to the obstacle
+            % - param t: (int) time step
+            % - param obs: (agent) obstacle
+            % - param varargin: [optional] (float) range noise
+            
+            minArgs = 3;
+            noise = 0;
+            if nargin > minArgs
+                noise = varargin{1};
+            end
+            obj.d_a(t, obs.id) = sqrt((obj.x(t) - obs.x(t))^2 + (obj.y(t) - obs.y(t))^2) + noise;
+        end
+
+        function bearing_obs(obj, t, obs, varargin)
+            %bearing_obs: compute angle to the obstacle
+            % - param t: (int) time step
+            % - param obs: (agent) obstacle
+            % - param varargin: [optional] (float) beearing noise
+            
+            minArgs = 3;
+            noise = 0;
+            if nargin > minArgs
+                noise = varargin{1};
+            end
+            obj.theta_a(t, obs.id) = atan2(obj.y(t) - obs.y(t), obj.x(t) - obs.x(t)) + noise;
+        end
+        
+        function [Ft, gFt] = total_force_field(obj, t)
+            %total_force_field: compute attractive and repulsive forces
+            % - param t: (int) time step
+            % - return Ft: (float) total force
+            % - return gFt: (float) gradient of total force
+            
+            Fr = [0 0];
+            gFr = [0 0; 0 0];
+            [Fa, gFa] = obj.goal_force(t);
+            col_index = 1;
+            for o = obj.obs
+                [Fr_o, gFr_o] = obj.obs_force(t, o, obj.collision(col_index));
+                Fr = Fr + Fr_o;
+                gFr = gFr + gFr_o;
+                col_index = col_index + 1;
+
+            end
+            Ft = Fa + Fr;
+            gFt = gFa + gFr;
+        end
+        
+    end
+    
+    methods (Access=private)
+        
+        function [collision, risk] = build_cone(obj, obs, t)
+            %build_cone: cone analysis between two agents
+            % - param obs: (agent) obstacle for cone computation
+            % - param t: (int) time step
+            % - return collision: (bool) collision detected by cone analysis
+            % - return risk: (float) risk measure
+
+            
+            risk = 0;
+            
+            Va = [obj.x(t) - obj.x(t-1);
+                  obj.y(t) - obj.y(t-1)];
+            Vobs = [obs.x(t) - obs.x(t-1);
+                    obs.y(t) - obs.y(t-1)];
+            Vrel = Va - Vobs;
+
+            cone_origin = [obj.x(t-1) + Vobs(1);
+                           obj.y(t-1) + Vobs(2)];
+
+            % straight line from a to obs = r_{a_obs}
+            slope_line_obj_obs = (obs.y(t-1) - obj.y(t-1)) / (obs.x(t-1) - obj.x(t-1));
+
+            % straight line perpendicular to r_{obj_obs} and passing through obs
+            slope_pline = -1/slope_line_obj_obs;
+            intercept = slope_pline*(-obs.x(t-1)) + obs.y(t-1);
+            [x_intersection, y_intersection] = linecirc(slope_pline, intercept, obs.x(t-1), obs.y(t-1), obj.eta_0);
+            x_intersection = x_intersection + Vobs(1);
+            y_intersection = y_intersection + Vobs(2);
+
+            % cone 
+            cone = [cone_origin(1) x_intersection(1) x_intersection(2);
+                    cone_origin(2) y_intersection(1) y_intersection(2)];
+
+            % collision evaluation
+            collision = inpolygon(cone_origin(1) + Vrel(1), cone_origin(2) + Vrel(2), cone(1,:), cone(2,:));
+            if collision
+                time_collision_measure = sqrt(Vrel(1)^2 + Vrel(2)^2);
+                w_effort_measure_1 = point_to_line([cone_origin(1) + Vrel(1), cone_origin(2) + Vrel(2), 1], [cone_origin', 1], [x_intersection(1), y_intersection(1), 1]);
+                w_effort_measure_2 = point_to_line([cone_origin(1) + Vrel(1), cone_origin(2) + Vrel(2), 1], [cone_origin', 1], [x_intersection(2), y_intersection(2), 1]);
+                w_effort_measure = min(w_effort_measure_1, w_effort_measure_2);             
+                risk = time_collision_measure + w_effort_measure;
+            end
+        end
+               
+        function [Fa, gFa] = goal_force(obj, t)
+            %goal_force: compute attractive force due to the goal
+            % - param t: (int) time step
+            % - return Fa: (float) attractive force
+            % - return gFa: (float) gradient of attractive force
+
+            
+            [dx_gh, dy_gh] = dxdy(obj.d_a(t-1, obj.g_seq(t-1)), obj.theta_a(t-1, obj.g_seq(t-1)));
+            Fa = attractive_force(obj.g.Ka, dx_gh, dy_gh);
+            gFa = attractive_gradient(obj.g.Ka);
+        end
+
+        function [Fr, gFr] = obs_force(obj, t, obs, collision)
+            %goal_force: compute repulsive or vortex force due to the obstacle
+            % - param t: (int) time step
+            % - param obs: (agent) obstacle
+            % - param collision: (bool) collision bit compute by measure_risk
+            % - return Fr: (float) repulsive or vortex force
+            % - return gFr: (float) gradient of repulsive or vortex force
+            
+            Fr = [0 0];
+            gFr = [0 0; 0 0];
+            [dx_hh, dy_hh] = dxdy(obj.d_a(t-1, obs.id), obj.theta_a(t-1, obs.id));
+
+            if collision && obj.d_a(t-1, obs.id) < obs.eta_0
+                obj.interaction(t, obs.id) = true;
+                switch obs.rep_force_type
+                    case Rep_force.REPULSIVE
+                        Fr = repulsive_force(obs.Kr, dx_hh, dy_hh);
+                        gFr = repulsive_gradient(obs.Kr, dx_hh, dy_hh);
+                    case Rep_force.VORTEX
+                        Fr =  vortex_force(obs.Kr, dx_hh, dy_hh);
+                        gFr = vortex_gradient(obs.Kr, dx_hh, dy_hh);
+                end
+            end
+        end
     end
 end
 

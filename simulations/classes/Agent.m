@@ -16,6 +16,18 @@ classdef Agent < handle
     
     methods
         function obj = Agent(id, color, Ka, Kr, eta_0, x, y, theta, tout, rep_force_type)
+            %Agent: class constructor
+            % - param id: (integer) number associated to this agent
+            % - param color: (char) color associated to this agent (example 'k', 'r')
+            % - param Ka: (float) attractive gain
+            % - param Kr: (float) repulsive gain
+            % - param eta_0: (float) minimum distance from obstacles
+            % - param x: (float) initial pos-x
+            % - param y: (float) initial pos-y
+            % - param theta: (float) initial orientation
+            % - param tout: (array) time vector
+            % - param rep_force_type: (enum) example REPULSIVE, VORTEX
+            
             obj.id = id;
             obj.x = x*ones(length(tout),1);
             obj.y = y*ones(length(tout),1);
@@ -37,6 +49,8 @@ classdef Agent < handle
         end
 
         function draw(obj, t)
+            %draw: Draw current agent position
+            % - param t: time step
             
             % draw position
             plot(obj.x(t), obj.y(t), 's', 'MarkerSize', 10, 'Color', obj.color)

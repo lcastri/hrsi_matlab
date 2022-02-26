@@ -1,5 +1,5 @@
 %% create README.txt
-fileID = fopen(ex_path + '/README.txt', 'w');
+fileID = fopen(FileName + '/README.txt', 'w');
 t = now;
 d = datetime(t,'ConvertFrom','datenum');
 fprintf(fileID, "Simulation created on " + string(d) + "\n");
