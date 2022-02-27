@@ -1,4 +1,15 @@
 function [cone, collision, risk] = cone_building(A, a, obs, eta, t, DT)
+%build_cone: cone analysis between two agents
+% - param A: (struct) struct containing all agents in the scenario
+% - param a: (int) selected agent id for cone computation
+% - param obs: (int) obstacle id for cone computation
+% - param eta: (float) min distance from the obstacles
+% - param t: (int) time step
+% - param DT: (int) delta time
+% - return cone: (matrix) matrix containing cone vertices 2x3
+% - return collision: (bool) collision detected by cone analysis
+% - return risk: (float) risk measure
+            
     cone = nan;
     collision = false;
     risk = 0;

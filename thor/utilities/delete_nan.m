@@ -1,4 +1,9 @@
 function no_nan_data = delete_nan(data, DT)
+%delete_nan: delete nan from data struct
+% - param data: (struct) struct containing agents data with NaNs
+% - param DT: (int) delta time
+% - return no_nan_data: (struct) struct containing agents data without NaNs
+
     no_nan_data = {};
     for i = 1 : size(data,1)
         h = data{i};

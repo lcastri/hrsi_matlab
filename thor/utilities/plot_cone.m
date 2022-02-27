@@ -1,5 +1,15 @@
-function plot_cone(obst_x, obst_y, a, obs, A, G, cone, risk, t)     
-   
+function plot_cone(obst_x, obst_y, a, obs, A, G, cone, collision, t)     
+%plot_cone: plot cone VO
+% - param obst_x: (array) parameter to draw the map
+% - param obst_y: (array) parameter to draw the map
+% - param a: (int) index selected agent
+% - param obs: (int) index closest obstacle
+% - param A: (struct) agents struct
+% - param G: (struct) goals struct
+% - param cone: (matrix) cone vertices 2x3
+% - param collision: (bool) collision bit 
+% - param t: (int) time step
+
     % selected a
     % position
     plot(A{a}.x(t-1), A{a}.y(t-1), '.', 'MarkerSize', 20, 'Color', 'r')
@@ -31,7 +41,7 @@ function plot_cone(obst_x, obst_y, a, obs, A, G, cone, risk, t)
     hold on
 
     % cone
-    if risk
+    if collision
         c = 'r';
     else
         c = 'g';

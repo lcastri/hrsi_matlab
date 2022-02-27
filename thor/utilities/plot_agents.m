@@ -1,5 +1,14 @@
 function plot_agents(L, obst_x, obst_y, selected_A, A, G, eta_0, t)     
-   
+%plot_agents: plot agents in A
+% - param L: (float) length orientation arrow
+% - param obst_x: (array) parameter to draw the map
+% - param obst_y: (array) parameter to draw the map
+% - param selected_A: (int) index selected agent
+% - param A: (struct) agents struct
+% - param G: (struct) goals struct
+% - param eta_0: (float) obstacle minimum distance
+% - param t: (int) time step
+
     for a = 1 : length(A)
         c = 'k';
         if a == selected_A

@@ -1,4 +1,11 @@
 function [DT, data] = extract_data(dataset, n_goals, step)
+%extract_data: extract x,y,DT data from a dataset.mat
+% - param dataset: (.mat file) dataset.mat
+% - param n_goals: (int) number of static agent
+% - param step: (int) sub-sampling parameter (= 1 if we want all data)
+% - return DT: (float) delta time dataset
+% - return data: (struct) data extracted
+
     body_colors = [
         [0,0,0]
         [0,0,1]

@@ -1,5 +1,15 @@
 function plot_situation(makeVideo, video, L, obst_x, obst_y, selected_A, A, G, t)     
-   
+%plot_situation: plot scenario situation at time t
+% - param makeVideo: (bool) record video bit
+% - param video: video instance
+% - param L: (float) length orientation arrow
+% - param obst_x: (array) parameter to draw the map
+% - param obst_y: (array) parameter to draw the map
+% - param selected_A: (int) index selected agent
+% - param A: (struc) struct containing all agents
+% - param G: (struct) goals struct
+% - param t: (int) time step
+
     for a = 1 : length(A)
         c = 'k';
         if a == selected_A

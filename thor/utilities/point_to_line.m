@@ -1,7 +1,10 @@
 function d = point_to_line(pt, v1, v2)
-% pt should be nx3
-% v1 and v2 are vertices on the line (each 1x3)
-% d is a nx1 vector with the orthogonal distances
+%point_to_line: min distance point to line
+% - param pt: (array) point coordinates nx3
+% - param v1: (array) vertice on the line 1x3
+% - param v2: (array) vertice on the line 1x3
+% - return d: (float) min distance
+
 v1 = repmat(v1,size(pt,1),1);
 v2 = repmat(v2,size(pt,1),1);
 a = v1 - v2;
