@@ -57,7 +57,7 @@ classdef Agent < handle
             hold on
 
             % draw id
-            text(obj.x(t)+0.25, obj.y(t), string(obj.id), 'Color','red')
+            text(obj.x(t)+0.35, obj.y(t), string(obj.id), 'Color','m')
             hold on
         end 
     end

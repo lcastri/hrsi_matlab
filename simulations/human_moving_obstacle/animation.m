@@ -11,6 +11,8 @@ switch answer
             mkdir('video')
         end
         video = VideoWriter('video/simulation.avi');
+        video.FrameRate = 50;
+        video.Quality = 85;
         open(video)
         ax = gca();
     otherwise

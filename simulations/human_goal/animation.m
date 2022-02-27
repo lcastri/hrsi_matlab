@@ -11,6 +11,8 @@ switch answer
             mkdir('video')
         end
         video = VideoWriter('video/simulation.avi');
+        video.FrameRate = 50;
+        video.Quality = 85;
         open(video)
         ax = gca();
     otherwise
@@ -19,7 +21,7 @@ switch answer
 end
 
 %% PLOT
-step = 10; % to change to speed up the video
+step = 1; % to change to speed up the video
 
 for t = 1 : step : length(tout)
     plot_situation(makeVideo, video, Boundaries, [G;U], t, axis_def)

@@ -16,7 +16,7 @@ Ka = 4;
 
 % Repulsive field
 Kr = 6;
-eta_0 = 1.5;
+eta_0 = 2.5;
 
 % Total field
 Kv = 0.2;

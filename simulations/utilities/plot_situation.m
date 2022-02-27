@@ -32,7 +32,7 @@ function plot_situation(makeVideo, video, bounds, A, t, ax)
 
     % to avoid problem with the figure initialisation
     if t == 1
-        pause(0.25)
+        pause(0.5)
     end
 
     % get current frame for the video
