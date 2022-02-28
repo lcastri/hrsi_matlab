@@ -4,9 +4,9 @@ clc
 
 %% Add utilities folder
 currentFolder = pwd;
-currentFolder_splitted = string(strsplit(currentFolder,'/'));
-projectFolder_index = find(strcmp(currentFolder_splitted,'simulations'));
-env_path = strjoin(currentFolder_splitted(1, 1:projectFolder_index),'/');
+currentFolder_splitted = string(strsplit(currentFolder, '/'));
+projectFolder_index = find(strcmp(currentFolder_splitted, 'hrsi'));
+env_path = strjoin(currentFolder_splitted(1, 1:projectFolder_index), '/');
 addpath(genpath(env_path + '/utilities'))
 addpath(genpath(env_path + '/classes'))
 
