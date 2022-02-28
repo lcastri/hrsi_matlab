@@ -6,7 +6,7 @@ ur = [9.4 4.2];
 br = [9.4 -4.2];
 bl = [-9.4 -4.2];
 
-Boundaries = [ul;
+boundaries = [ul;
               ur;
               br;
               bl;

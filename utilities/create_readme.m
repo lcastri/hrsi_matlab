@@ -28,12 +28,12 @@ end
 
 fprintf(fileID, "Simulation parameters:\n");
 fprintf(fileID, "- sampling time [s]: %f\n", DT);
-fprintf(fileID, "- simulation time [s] : %f\n", Simulation_time);
+fprintf(fileID, "- simulation time [s] : %f\n", simulation_time);
 fprintf(fileID, "- distance threshold [m]: %f\n", dist_thres);
 fprintf(fileID, "\n");
 
 fprintf(fileID, "Velocity saturation:\n");
-fprintf(fileID, "- Active [True/False]: %s\n", string(saturation_op));
+fprintf(fileID, "- Active [True/False]: %s\n", string(sat_op));
 fprintf(fileID, "- max velocity [m/s] : %f\n", max_v);
 fprintf(fileID, "\n");
 

@@ -35,10 +35,10 @@ for t = 2 : length(tout)
             U{i}.v(t) = U{i}.v(t-1) + Noise_V.values(t);
             U{i}.w(t) = U{i}.w(t-1);
         end
-
-        %% PLOT CURRENT STATE
-%        plot_situation(false, 0, Boundaries, [G;U], t, axis_def)
     end
+
+    %% PLOT CURRENT STATE
+%     plot_situation(false, 0, Boundaries, [G;U], t, axis_def)
 
     %% DATA
     data{1,1}.data(t,1) = wrapTo2Pi(U{1}.theta_a(t, U{1}.g_seq(t)));

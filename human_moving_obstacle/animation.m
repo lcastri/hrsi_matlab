@@ -24,7 +24,7 @@ end
 step = 1; % to change to speed up the video
 
 for t = 1 : step : length(tout)
-    plot_situation(makeVideo, video, Boundaries, [G; U], t, axis_def)
+    plot_situation(makeVideo, video, boundaries, [G; U], t, axis_def)
 end
 
 if makeVideo

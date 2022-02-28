@@ -8,7 +8,7 @@ ur = [5 5];
 br = [5 -5];
 bl = [-5 -5];
 
-Boundaries = [ul;
+boundaries = [ul;
               ur;
               br;
               bl;

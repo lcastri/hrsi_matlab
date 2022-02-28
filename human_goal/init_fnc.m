@@ -24,7 +24,7 @@ L = 1.25;
 Simulation_time = 150;
 tout = 0 : DT : Simulation_time;
 dist_thres = 0.01;
-saturation_op = true;
+sat_op = true;
 max_v = 1.75;
 task_op = true;
 max_t = 15;
@@ -60,7 +60,7 @@ u1 = Unicycle(4, 'r', ...
               0, 0, 0, ...
               g1.x(1), g1.y(1), -pi/2, ...
               tout, 0, n_agent, L, ...
-              saturation_op, max_v, task_op, Kv, Kw);
+              sat_op, max_v, task_op, Kv, Kw);
 u1.set_goal(g1, 1)
 
 U{1,1} = u1;
