@@ -37,4 +37,6 @@ thor_extras-master/
 *.mat
 *.txt
 *.csv
+*.ipynb_checkpoints
+
 
