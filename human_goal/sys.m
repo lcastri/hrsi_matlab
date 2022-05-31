@@ -44,5 +44,7 @@ for t = 2 : length(tout)
     data{1,1}.data(t,1) = wrapTo2Pi(U{1}.theta_a(t, U{1}.g_seq(t)));
     data{2,1}.data(t,1) = U{1}.d_a(t, U{1}.g_seq(t));
     data{3,1}.data(t,1) = abs(U{1}.v(t));
+    
 end
+
 end_fnc;

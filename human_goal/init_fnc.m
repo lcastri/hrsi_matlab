@@ -21,7 +21,7 @@ Kw = 3;
 %% Init data definition
 DT = 0.1;
 L = 1.25;
-Simulation_time = 150;
+Simulation_time = 600;
 tout = 0 : DT : Simulation_time;
 dist_thres = 0.01;
 sat_op = true;
