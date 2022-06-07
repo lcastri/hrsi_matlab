@@ -6,7 +6,7 @@ for t = 2 : length(tout)
         
         %% GOAL
         current_goal = U{i}.g_seq(t-1);
-%         if i ~= 2
+        
         U{i}.g_changed(t) = ~U{i}.g_changed(t-1) && U{i}.d_a(t-1, U{i}.g_seq(t-1)) <= dist_thres;
         if U{i}.g_changed(t-1)
             if i == 1
@@ -14,16 +14,7 @@ for t = 2 : length(tout)
             end
             current_goal = randi(length(Goals_h));
         end
-%         else
-%             U{i}.g_changed(t) = ~U{i}.g_changed(t-1) && U{i}.d_a(t-1, U{i}.g_seq(t-1)) <= 0.5;
-%             if U{i}.g_changed(t-1)
-%                 if current_goal + 1 <= length(Goals_r) + length(Goals_h)
-%                     current_goal = current_goal + 1;
-%                 else
-%                     current_goal = length(Goals_r)+1;
-%                 end
-%             end
-%         end
+
         U{i}.set_goal(G{current_goal}, t);
         U{i}.compute_next_state(t, DT);
     end

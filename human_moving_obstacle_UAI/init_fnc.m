@@ -25,7 +25,7 @@ Kw = 4;
 %% Init data definition
 DT = 0.1;
 L = 1.25;
-Simulation_time = 60;
+Simulation_time = 150;
 tout = 0 : DT : Simulation_time;
 dist_thres = 0.1;
 saturation_op = true;
@@ -49,24 +49,12 @@ for g = 1 : length(Goals_h)
     clear goal
 end
 
-% Gr = {};
-% for g = length(Goals_h) + 1 : length(Goals_h) + length(Goals_r)
-%     goal = Agent(g, 'k', ...
-%                  Ka, 0, 0, ...
-%                  Goals_r(g-length(Goals_h),1), Goals_r(g-length(Goals_h),2), 0, ...
-%                  tout, 0);
-%     Gr{g-length(Goals_h),1} = goal;
-%     clear goal
-% end
-
-% G = [Gh; Gr];
 G = Gh;
 
 % Human/Robot
 U = {};
-n_a = 4;%5;
+n_a = 4;
 
-% n_agent = length(Goals_h) + length(Goals_r) + n_a;
 n_agent = length(Goals_h) + n_a;
 
 h = Unicycle(1+length(G), 'r', ...
@@ -78,25 +66,16 @@ h.set_goal(Gh{1}, 1)
 U{1,1} = h; 
          
 for obs = 2 : n_a
-%     if obs == 2
-%         gx = Gr{obs}.x(1);
-%         gy = Gr{obs}.y(1);
-%         sat_v = 0.75;
-%     else
     gx = Gh{obs}.x(1);
     gy = Gh{obs}.y(1);
     sat_v = 0.75;
-%     end
     r = Unicycle(obs+length(G), 'k', ...
                  0, Kr, eta_0, ...
                  gx, gy, 0, ...
                  tout, Rep_force.REPULSIVE, n_agent, L, ...
                  saturation_op, sat_v, task_op, Kv, Kw);
-%     if obs == 2
-%         r.set_goal(Gr{obs}, 1)
-%     else
+
     r.set_goal(Gh{obs}, 1)
-%     end
     U{obs,1} = r; 
 end
 clear r
