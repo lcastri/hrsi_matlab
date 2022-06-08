@@ -39,48 +39,48 @@ noise;
 
 %% Agent definition
 % Goal
-Gh = {};
+G = {};
 for g = 1 : length(Goals_h)
     goal = Agent(g, 'k', ...
                  Ka, 0, 0, ...
                  Goals_h(g,1), Goals_h(g,2), 0, ...
                  tout, 0);
-    Gh{g,1} = goal;
+    G{g,1} = goal;
     clear goal
 end
 
-G = Gh;
-
 % Human/Robot
 U = {};
-n_a = 4;
+n_a = 3;
 
 n_agent = length(Goals_h) + n_a;
-
-h = Unicycle(1+length(G), 'r', ...
-             0, Kr, eta_0, ...
-             Gh{1}.x(1), Gh{1}.y(1), 0, ...
-             tout, Rep_force.VORTEX, n_agent, L, ...
-             saturation_op, max_v, task_op, Kv, Kw);
-h.set_goal(Gh{1}, 1)
-U{1,1} = h; 
-         
-for obs = 2 : n_a
-    gx = Gh{obs}.x(1);
-    gy = Gh{obs}.y(1);
-    sat_v = 0.75;
+        
+for obs = 1 : n_a
+    gx = G{obs}.x(1);
+    gy = G{obs}.y(1);
     r = Unicycle(obs+length(G), 'k', ...
                  0, Kr, eta_0, ...
                  gx, gy, 0, ...
                  tout, Rep_force.REPULSIVE, n_agent, L, ...
-                 saturation_op, sat_v, task_op, Kv, Kw);
+                 saturation_op, max_v, task_op, Kv, Kw);
 
-    r.set_goal(Gh{obs}, 1)
-    U{obs,1} = r; 
+    r.set_goal(G{obs}, 1)
+    U{obs,1} = r;
+
 end
 clear r
+
 %% Obstacle definition
-h.set_obs([U{2:end}],1)
+for i = 1 : n_a
+    agents = [U{:}];
+    agents(agents == U{i}) = [];
+    U{i}.set_obs(agents,1)
+end
+
+%% Places
+available_places = 1 : length(Goals_h);
+occupied_places = 1 : n_a;
+available_places = setdiff(available_places, occupied_places);
 
 %% DATA
 data{1,1}.data = [];

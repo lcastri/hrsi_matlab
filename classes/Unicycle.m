@@ -411,7 +411,6 @@ classdef Unicycle < Agent
             % - param t: (int) time step
             % - return Fa: (float) attractive force
             % - return gFa: (float) gradient of attractive force
-
             
             [dx_gh, dy_gh] = dxdy(obj.d_a(t-1, obj.g_seq(t-1)), obj.theta_a(t-1, obj.g_seq(t-1)));
             Fa = attractive_force(obj.g.Ka, dx_gh, dy_gh);

@@ -12,7 +12,10 @@ for t = 2 : length(tout)
             if i == 1
                 theta_to_change = true;
             end
-            current_goal = randi(length(Goals_h));
+            next_goal_id = randsample(available_places, 1);
+            available_places(available_places == next_goal_id) = [];
+            available_places(end+1) = U{i}.g_seq(t-1);
+            current_goal = next_goal_id;
         end
 
         U{i}.set_goal(G{current_goal}, t);
@@ -26,23 +29,18 @@ for t = 2 : length(tout)
 
         %% VELOCITIES
         [Ft, gFt] = U{i}.total_force_field(t);
-        
-        if i == 1
-            if theta_to_change
-                if abs(U{i}.theta_a(t, U{i}.g_seq(t)) - U{i}.theta(t)) > 0.01
-                    U{i}.v(t) = noise_v.values(t);
-                    U{i}.w(t) = Kw * (atan2(Ft(2), Ft(1)) - U{i}.theta(t));
 
-                else
-                    theta_to_change = false;
-                end
+        if theta_to_change
+            if abs(U{i}.theta_a(t, U{i}.g_seq(t)) - U{i}.theta(t)) > 0.01
+                U{i}.v(t) = noise_v.values(t);
+                U{i}.w(t) = Kw * (atan2(Ft(2), Ft(1)) - U{i}.theta(t));
+
             else
-                U{i}.compute_next_inputs(t, Ft, gFt, noise_v.values(t), 0)
+                theta_to_change = false;
             end
         else
-            U{i}.compute_next_inputs(t, Ft, gFt)
-        end
-        
+            U{i}.compute_next_inputs(t, Ft, gFt, noise_v.values(t), 0)
+        end        
     end
     
     %% PLOT CURRENT STATE
