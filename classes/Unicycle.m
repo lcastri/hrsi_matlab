@@ -126,7 +126,6 @@ classdef Unicycle < Agent
             obj.risk(t) = exp(obj.v(t-1));
             
             if ~isempty(obj.obs)
-%                 o = obj.get_closest_obs(t);
                 tmp_risk = 0;
                 tmp_col = zeros(size(obj.obs));
                 col_index = 1;
