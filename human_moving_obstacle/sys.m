@@ -35,22 +35,7 @@ for t = 2 : length(tout)
 
         %% VELOCITIES
         [Ft, gFt] = U{i}.total_force_field(t);
-        
-        if i == 1
-            if theta_to_change
-                if abs(U{i}.theta_a(t, U{i}.g_seq(t)) - U{i}.theta(t)) > 0.01
-                    U{i}.v(t) = noise_v.values(t);
-                    U{i}.w(t) = Kw * (atan2(Ft(2), Ft(1)) - U{i}.theta(t));
-
-                else
-                    theta_to_change = false;
-                end
-            else
-                U{i}.compute_next_inputs(t, Ft, gFt, noise_v.values(t), 0)
-            end
-        else
-            U{i}.compute_next_inputs(t, Ft, gFt)
-        end
+        U{i}.compute_next_inputs(t, Ft, gFt)
         
     end
     

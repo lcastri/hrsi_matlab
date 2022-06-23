@@ -108,5 +108,3 @@ data{3,1}.data = [];
 data{1,1}.name = "d_g";
 data{2,1}.name = "v";  
 data{3,1}.name = "risk";  
-
-theta_to_change = false;
