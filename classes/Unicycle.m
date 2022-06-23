@@ -5,6 +5,8 @@ classdef Unicycle < Agent
         Kw
         d_a
         theta_a
+        risk_a
+        collision_a
         g_seq
         g
         g_changed
@@ -17,6 +19,7 @@ classdef Unicycle < Agent
         L
         risk
         collision
+        just_turn
     end
     
     methods (Access=public)
@@ -46,6 +49,8 @@ classdef Unicycle < Agent
             obj.theta = zeros(length(tout),1);
             obj.d_a = zeros(length(tout), n_agent);
             obj.theta_a = zeros(length(tout), n_agent);
+            obj.risk_a = zeros(length(tout), n_agent);
+            obj.collision_a = zeros(length(tout), n_agent);
             obj.g_seq = zeros(length(tout), 1);
             obj.g_changed = zeros(length(tout), 1);
             obj.interaction = zeros(length(tout), n_agent);
@@ -119,26 +124,25 @@ classdef Unicycle < Agent
             % - param varargin: [optional] (float) risk noise
 
             minArgs = 2;
-            noise_risk = 0;
+            noise_risk = zeros(size(obj.d_a));
             if nargin > minArgs
                 noise_risk = varargin{1};
             end
-            obj.risk(t) = exp(obj.v(t-1));
             
             if ~isempty(obj.obs)
-                tmp_risk = 0;
-                tmp_col = zeros(size(obj.obs));
-                col_index = 1;
                 for o = obj.obs
+                    obj.risk_a(t, o.id) = exp(obj.v(t-1));
                     if obj.d_a(t-1, o.id) < obj.eta_0
                         [col, r] = obj.build_cone(o, t);
-                        tmp_risk = tmp_risk + r;
-                        tmp_col(col_index) = col;
+                        if col
+                            obj.risk_a(t, o.id) = obj.risk_a(t, o.id)*exp(r);
+                        end
+                        obj.collision_a(t, o.id) = col;
                     end
-                    col_index = col_index + 1;
+                    obj.risk_a(t, o.id) = obj.risk_a(t, o.id) + noise_risk;
                 end
-                obj.collision = tmp_col;
-                obj.risk(t) = obj.risk(t) + exp(tmp_risk) + noise_risk;
+                obj.risk(t) = sum(obj.risk_a(t, :));
+
             end
         end
 
@@ -182,7 +186,11 @@ classdef Unicycle < Agent
             %set_goal: set position goal (agent)
             % - param goal: (agent) agent to reach
             % - param t: (int) time step
-            
+            if t > 1
+                if goal.id ~= obj.g_seq(t-1)
+                    obj.just_turn = true;
+                end
+            end
             obj.g_seq(t) = goal.id;
             obj.g = goal;
             if t == 1
@@ -278,8 +286,18 @@ classdef Unicycle < Agent
                 noise(1) = varargin{1};
                 noise(2) = varargin{2};
             end
-            obj.compute_v(t, Ft, noise(1))
-            obj.compute_w(t, Ft, gFt, noise(2))
+            if obj.just_turn
+                if abs(obj.theta_a(t, obj.g_seq(t)) - obj.theta(t)) > 0.01
+                    obj.v(t) = noise(1);
+                    obj.w(t) = obj.Kw * (atan2(Ft(2), Ft(1)) - obj.theta(t)) + noise(2);
+
+                else
+                    obj.just_turn = false;
+                end
+            else
+                obj.compute_v(t, Ft, noise(1))
+                obj.compute_w(t, Ft, gFt, noise(2))     
+            end
         end
         
         function range_g(obj, t, varargin)
@@ -345,12 +363,10 @@ classdef Unicycle < Agent
             Fr = [0 0];
             gFr = [0 0; 0 0];
             [Fa, gFa] = obj.goal_force(t);
-            col_index = 1;
             for o = obj.obs
-                [Fr_o, gFr_o] = obj.obs_force(t, o, obj.collision(col_index));
+                [Fr_o, gFr_o] = obj.obs_force(t, o, obj.collision_a(t, o.id));
                 Fr = Fr + Fr_o;
                 gFr = gFr + gFr_o;
-                col_index = col_index + 1;
 
             end
             Ft = Fa + Fr;
