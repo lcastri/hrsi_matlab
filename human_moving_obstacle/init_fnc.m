@@ -25,8 +25,8 @@ Kw = 4;
 %% Init data definition
 DT = 0.1;
 L = 1.25;
-Simulation_time = 150;
-tout = 0 : DT : Simulation_time;
+simulation_time = 150;
+tout = 0 : DT : simulation_time;
 dist_thres = 0.1;
 saturation_op = true;
 max_v = 1.75;
