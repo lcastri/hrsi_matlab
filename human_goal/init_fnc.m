@@ -21,8 +21,8 @@ Kw = 3;
 %% Init data definition
 DT = 0.1;
 L = 1.25;
-Simulation_time = 600;
-tout = 0 : DT : Simulation_time;
+simulation_time = 300;
+tout = 0 : DT : simulation_time;
 dist_thres = 0.01;
 sat_op = true;
 max_v = 1.75;
@@ -66,7 +66,7 @@ u1.set_goal(g1, 1)
 U{1,1} = u1;
 
 %% DATA
-data{1,1}.name = 'theta_{gh}';
-data{2,1}.name = 'D_{gh}';
-data{3,1}.name = 'v_h';
+data{1,1}.name = 'theta_g';
+data{2,1}.name = 'd_g';
+data{3,1}.name = 'v';
 
