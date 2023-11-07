@@ -1,4 +1,4 @@
-function plot_situation(makeVideo, video, bounds, A, t, ax) 
+function plot_situation(makeVideo, video, draw_bound, bounds, A, t, ax) 
 %plot_situation: plot scenario situation at time t
 % - param makeVideo: (bool) record video bit
 % - param video: video instance
@@ -8,8 +8,10 @@ function plot_situation(makeVideo, video, bounds, A, t, ax)
 % - param ax: (array) axis figure [xmin xmax ymin ymax]
 
     % draw bounds
-    line(bounds(:,1), bounds(:,2), 'Color', 'k')
-    hold on
+    if draw_bound
+        line(bounds(:,1), bounds(:,2), 'Color', 'k')
+        hold on
+    end
 
     % draw agents
     for i = 1 : length(A)

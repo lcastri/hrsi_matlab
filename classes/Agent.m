@@ -12,10 +12,11 @@ classdef Agent < handle
         eta_0
         color
         rep_force_type
+        dt
     end
     
     methods
-        function obj = Agent(id, color, Ka, Kr, eta_0, x, y, theta, tout, rep_force_type)
+        function obj = Agent(id, color, Ka, Kr, eta_0, x, y, theta, tout, rep_force_type, dt)
             %Agent: class constructor
             % - param id: (integer) number associated to this agent
             % - param color: (char) color associated to this agent (example 'k', 'r')
@@ -39,6 +40,7 @@ classdef Agent < handle
             obj.eta_0 = eta_0;
             obj.color = color;
             obj.rep_force_type = rep_force_type;
+            obj.dt = dt;
 
             obj.x(1) = x;
             obj.y(1) = y;

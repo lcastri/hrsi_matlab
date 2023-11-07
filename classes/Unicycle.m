@@ -1,6 +1,8 @@
 classdef Unicycle < Agent
 
     properties
+        estim_x
+        estim_y
         Kv
         Kw
         d_a
@@ -18,12 +20,13 @@ classdef Unicycle < Agent
         obs
         L
         risk
+        rel_angle
         collision
         just_turn
     end
     
     methods (Access=public)
-        function obj = Unicycle(id, color, Ka, Kr, eta_0, x, y, theta, tout, rep_force_type, n_agent, L, sat_op, max_v, task_op, Kv, Kw)
+        function obj = Unicycle(id, color, Ka, Kr, eta_0, x, y, theta, tout, rep_force_type, n_agent, L, sat_op, max_v, task_op, Kv, Kw, dt)
             %Unicycle: class constructor
             % - param id: (integer) number associated to this agent
             % - param color: (char) color associated to this agent (example 'k', 'r')
@@ -43,9 +46,11 @@ classdef Unicycle < Agent
             % - param Kw: (float) angular velocity gain
             
             % parent constructor
-            obj@Agent(id, color, Ka, Kr, eta_0, x, y, theta, tout, rep_force_type);
+            obj@Agent(id, color, Ka, Kr, eta_0, x, y, theta, tout, rep_force_type, dt);
             obj.x = zeros(length(tout),1);
             obj.y = zeros(length(tout),1);
+            obj.estim_x = zeros(length(tout),1);
+            obj.estim_y = zeros(length(tout),1);
             obj.theta = zeros(length(tout),1);
             obj.d_a = zeros(length(tout), n_agent);
             obj.theta_a = zeros(length(tout), n_agent);
@@ -55,6 +60,7 @@ classdef Unicycle < Agent
             obj.g_changed = zeros(length(tout), 1);
             obj.interaction = zeros(length(tout), n_agent);
             obj.risk = zeros(length(tout), 1);
+            obj.rel_angle = zeros(length(tout), 1);
             
             obj.Kv = Kv;
             obj.Kw = Kw;
@@ -83,18 +89,20 @@ classdef Unicycle < Agent
             hold on
 
             % draw orientation
-            quiver(obj.x(t), obj.y(t), obj.L*cos(obj.theta(t)), obj.L*sin(obj.theta(t)), 0, 'Color', obj.color, 'MaxHeadSize', 1);
+            % quiver(obj.x(t), obj.y(t), obj.L*cos(obj.theta(t)), obj.L*sin(obj.theta(t)), 0, 'Color', obj.color, 'MaxHeadSize', 1);
+            % quiver(obj.x(t), obj.y(t), obj.v(t)*cos(obj.theta(t)), obj.v(t)*sin(obj.theta(t)), 0, 'Color', obj.color, 'MaxHeadSize', 1);
+
             hold on
 
             % draw goal bearing
-            line([obj.x(t) obj.x(t) + obj.L*cos(obj.theta_a(t, obj.g_seq(t)))], [obj.y(t) obj.y(t) + obj.L*sin(obj.theta_a(t, obj.g_seq(t)))], 'Color', obj.color);
+            % line([obj.x(t) obj.x(t) + obj.L*cos(obj.theta_a(t, obj.g_seq(t)))], [obj.y(t) obj.y(t) + obj.L*sin(obj.theta_a(t, obj.g_seq(t)))], 'Color', obj.color);
 
             % draw interactions
-            for o = obj.obs
-                if obj.interaction(t, o.id)
-                    line([obj.x(t) o.x(t)], [obj.y(t) o.y(t)], 'Color', 'm');
-                end
-            end
+            % for o = obj.obs
+            %     if obj.interaction(t, o.id)
+            %         line([obj.x(t) o.x(t)], [obj.y(t) o.y(t)], 'Color', 'm');
+            %     end
+            % end
         end
         
         function set_obs(obj, obs, t)
@@ -124,7 +132,7 @@ classdef Unicycle < Agent
             % - param varargin: [optional] (float) risk noise
 
             minArgs = 2;
-            noise_risk = zeros(size(obj.d_a));
+            noise_risk = 0;
             if nargin > minArgs
                 noise_risk = varargin{1};
             end
@@ -155,13 +163,16 @@ classdef Unicycle < Agent
             minArgs = 2;
             noise_range = 0;
             noise_bearing = 0;
+            % noise_relative = 0;
             if nargin > minArgs
                 noise_range = varargin{1};
                 noise_bearing = varargin{2};
+                % noise_relative = varargin{3};
             end
             for o = obj.obs
                 obj.range_obs(t, o, noise_range);
                 obj.bearing_obs(t, o, noise_bearing);
+                % obj.relative_angle(t, o, noise_relative);
             end
         end
 
@@ -278,7 +289,6 @@ classdef Unicycle < Agent
             % - param gFt: (float) gradient of total force
             % - param varargin1: [optional] (float) linear velocity noise
             % - param varargin2: [optional] (float) angular velocity noise
-
             
             minArgs = 4;
             noise = [0 0];
@@ -300,58 +310,72 @@ classdef Unicycle < Agent
             end
         end
         
-        function range_g(obj, t, varargin)
+        function range_g(obj, t, noise)
             %range_g: compute distance to the goal
             % - param t: (int) time step
-            % - param varargin: [optional] (float) range noise
-
-            minArgs = 2;
-            noise = 0;
-            if nargin > minArgs
-                noise = varargin{1};
-            end
+            % - param varargin: (float) range noise
             obj.d_a(t, obj.g_seq(t)) = sqrt((obj.g.x(t) - obj.x(t))^2 + (obj.g.y(t) - obj.y(t))^2) + noise;
         end
 
-        function bearing_g(obj, t, varargin)
+        function bearing_g(obj, t, noise)
             %bearing_g: compute angle to the goal
             % - param t: (int) time step
-            % - param varargin: [optional] (float) bearing noise
-            
-            minArgs = 2;
-            noise = 0;
-            if nargin > minArgs
-                noise = varargin{1};
-            end
+            % - param varargin: (float) bearing noise
             obj.theta_a(t, obj.g_seq(t)) = atan2(obj.g.y(t) - obj.y(t), obj.g.x(t) - obj.x(t)) + noise;
         end
 
-        function range_obs(obj, t, obs, varargin)
+        function range_obs(obj, t, obs, noise)
             %range_obs: compute distance to the obstacle
             % - param t: (int) time step
             % - param obs: (agent) obstacle
-            % - param varargin: [optional] (float) range noise
-            
-            minArgs = 3;
-            noise = 0;
-            if nargin > minArgs
-                noise = varargin{1};
-            end
+            % - param varargin: (float) range noise
             obj.d_a(t, obs.id) = sqrt((obj.x(t) - obs.x(t))^2 + (obj.y(t) - obs.y(t))^2) + noise;
         end
 
-        function bearing_obs(obj, t, obs, varargin)
+        function bearing_obs(obj, t, obs, noise)
             %bearing_obs: compute angle to the obstacle
             % - param t: (int) time step
             % - param obs: (agent) obstacle
-            % - param varargin: [optional] (float) beearing noise
-            
-            minArgs = 3;
-            noise = 0;
-            if nargin > minArgs
-                noise = varargin{1};
-            end
+            % - param varargin: (float) bearing noise
             obj.theta_a(t, obs.id) = atan2(obj.y(t) - obs.y(t), obj.x(t) - obs.x(t)) + noise;
+        end
+
+        function relative_angle(obj, t, obs, noise)
+            if t == 1
+                obj.rel_angle(t, obs.id) = 0;
+            else
+                x_disp = obj.x(t) - obj.x(t-1);
+                y_disp = obj.y(t) - obj.y(t-1);
+                v = [x_disp; y_disp] / obj.dt;
+    
+                obs_x_disp = obs.x(t) - obs.x(t-1);
+                obs_y_disp = obs.y(t) - obs.y(t-1);
+                obs_v = [obs_x_disp; obs_y_disp] / obj.dt;
+    
+                % Compute the dot product of the two vectors
+                dot_product = dot(v, obs_v);
+    
+                % Compute the magnitudes of the vectors
+                magnitude_v = norm(v);
+                magnitude_obs_v = norm(obs_v);
+                if magnitude_v < 0.05 || magnitude_obs_v < 0.05
+                    obj.rel_angle(t, obs.id) = 0;
+                    return
+                end
+                
+                % Compute the cosine of the angle between the vectors
+                cosine_angle = dot_product / (magnitude_v * magnitude_obs_v);
+                
+                % Compute the angle in radians
+                obj.rel_angle(t, obs.id) = acos(cosine_angle);
+            end
+        end
+
+        function estimate_next_pos(obj, t)
+            x_disp = obj.v(t) * cos(obj.rel_angle(t)) * obj.dt;
+            y_disp = obj.v(t) * sin(obj.rel_angle(t)) * obj.dt;
+            obj.estim_x(t) = obj.x(t) + x_disp;  % New x-coordinate of point A
+            obj.estim_y(t) = obj.y(t) + y_disp;  % New y-coordinate of point A
         end
         
         function [Ft, gFt] = total_force_field(obj, t)
@@ -367,7 +391,6 @@ classdef Unicycle < Agent
                 [Fr_o, gFr_o] = obj.obs_force(t, o, obj.collision_a(t, o.id));
                 Fr = Fr + Fr_o;
                 gFr = gFr + gFr_o;
-
             end
             Ft = Fa + Fr;
             gFt = gFa + gFr;
