@@ -58,7 +58,8 @@ for t = 2:length(tout)
     obs_v=obs_v* [1; 1i];
     h.rel_angle(t-1, r.id) = angle(v*obs_v');
 
-    % h.rel_angle(t-1, r.id) = atan2(abs(cross(obs_v, v, 2)),dot(obs_v, v));
+    % cross_prod = obs_x_disp*y_disp-obs_y_disp*x_disp;
+    % h.rel_angle(t-1, r.id) = wrapTo2Pi(atan2(abs(cross_prod),dot(obs_v, v)));
 
     % h.rel_angle(t-1, r.id) = (atan2(obs_y_disp, obs_x_disp) - atan2(y_disp(t), x_disp(t)));
     % Adjust the sign of h.rel_angle to match the orientation of vectors
