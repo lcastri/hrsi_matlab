@@ -7,24 +7,24 @@ function plot_situation_wGrid(makeVideo, video, r_id, A, t, ax)
 % - param t: (int) time step
 % - param ax: (array) axis figure [xmin xmax ymin ymax]
 
-    % % Define the grid size and cell resolution
-    % grid_size = 8;  % 8m x 8m grid
-    % cell_resolution = 1;  % 1m cell resolution
-    % 
-    % % Calculate the grid limits based on the center position
-    % x_min = A{r_id}.x(t) - grid_size / 2;
-    % x_max = A{r_id}.x(t) + grid_size / 2;
-    % y_min = A{r_id}.y(t) - grid_size / 2;
-    % y_max = A{r_id}.y(t) + grid_size / 2;
-    % 
-    % % Create a grid
-    % [x, y] = meshgrid(x_min:cell_resolution:x_max, y_min:cell_resolution:y_max);
-    % 
-    % % Plot the grid
-    % plot(x, y, 'Color', [0.6, 0.6, 0.6]);
-    % hold on
-    % plot(x', y', 'Color', [0.6, 0.6, 0.6]);
-    % hold on
+    % Define the grid size and cell resolution
+    grid_size = 8;  % 8m x 8m grid
+    cell_resolution = 1;  % 1m cell resolution
+
+    % Calculate the grid limits based on the center position
+    x_min = A{r_id}.x(t) - grid_size / 2;
+    x_max = A{r_id}.x(t) + grid_size / 2;
+    y_min = A{r_id}.y(t) - grid_size / 2;
+    y_max = A{r_id}.y(t) + grid_size / 2;
+
+    % Create a grid
+    [x, y] = meshgrid(x_min:cell_resolution:x_max, y_min:cell_resolution:y_max);
+
+    % Plot the grid
+    plot(x, y, 'Color', [0.6, 0.6, 0.6]);
+    hold on
+    plot(x', y', 'Color', [0.6, 0.6, 0.6]);
+    hold on
 
     % Calculate the row and column of the corresponding cell
     plot(A{r_id-1}.estim_x(t), A{r_id-1}.estim_y(t), '.', 'MarkerSize', 35, 'Color', 'c')
@@ -34,15 +34,15 @@ function plot_situation_wGrid(makeVideo, video, r_id, A, t, ax)
     % if row > 0 && col > 0 && row < size(x,1) && col < size(x,2) && row < size(y,1) && col < size(y,2)
     %     rectangle('Position', [x(row, col), y(row, col), cell_resolution, cell_resolution], 'FaceColor', 'm');
     % end
-    text(A{r_id}.x(t)+0.35, A{r_id}.y(t)+0.35, string(rad2deg(A{r_id}.rel_angle(t, r_id-1))), 'Color','m')
+    % text(A{r_id}.x(t)+0.35, A{r_id}.y(t)+0.35, string(rad2deg(A{r_id}.rel_angle(t, r_id-1))), 'Color','m')
 
     
     % draw agents
     for i = 1 : length(A)
         A{i}.draw(t)
-        if i == r_id
-            quiver(A{i}.x(t), A{i}.y(t), A{i-1}.v(t)*cos(A{i-1}.theta(t)), A{i-1}.v(t)*sin(A{i-1}.theta(t)), 0, 'Color', A{i-1}.color, 'MaxHeadSize', 1);
-        end
+        % if i == r_id
+        %     quiver(A{i}.x(t), A{i}.y(t), A{i-1}.v(t)*cos(A{i-1}.theta(t)), A{i-1}.v(t)*sin(A{i-1}.theta(t)), 0, 'Color', A{i-1}.color, 'MaxHeadSize', 1);
+        % end
     end
 
     % set axis

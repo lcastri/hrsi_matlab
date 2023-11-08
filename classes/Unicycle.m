@@ -216,7 +216,7 @@ classdef Unicycle < Agent
             
             obj.x(t) = obj.x(t-1) + obj.dt*obj.v(t-1)*cos(obj.theta(t-1));
             obj.y(t) = obj.y(t-1) + obj.dt*obj.v(t-1)*sin(obj.theta(t-1));
-            obj.theta(t) = wrapToPi(obj.theta(t-1) + obj.dt*obj.w(t-1));
+            obj.theta(t) = obj.theta(t-1) + obj.dt*obj.w(t-1);
         end
 
         function compute_v(obj, t, Ft, varargin)

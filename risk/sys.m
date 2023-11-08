@@ -61,22 +61,11 @@ for t = 2:length(tout)
 
     estim_x_disp = norm(v) * cos(r.rel_angle(t-1, h.id)) * h.dt;
     estim_y_disp = norm(v) * sin(r.rel_angle(t-1, h.id)) * h.dt;
-    % obs_v(abs(obs_v) < 0.0001) = 0;
-    % I NEED A ROTATION MATRIX
-    if t<750
-        estim_x_disp = sign(obs_v(t,1))*estim_x_disp;
-        estim_y_disp = sign(obs_v(t,1))*estim_y_disp;
-    else
-        estim_x_disp = sign(obs_v(t,2))*estim_x_disp;
-        estim_y_disp = sign(obs_v(t,2))*estim_y_disp;
-    end
-    h.estim_x(t-1) = h.x(t-1) + estim_x_disp;  % New x-coordinate of point A
-    h.estim_y(t-1) = h.y(t-1) + estim_y_disp;  % New y-coordinate of point A
+    
+    estim_disp = invRotationMatrixZ(r.theta(t-1))*[estim_x_disp;estim_x_disp];
+
+    h.estim_x(t-1) = h.x(t-1) + estim_disp(1);  % New x-coordinate of point A
+    h.estim_y(t-1) = h.y(t-1) + estim_disp(2);  % New y-coordinate of point A
 end
 
-figure
-subplot(2, 1, 1)
-plot(1:length(tout), obs_v(:, 1))
-subplot(2, 1, 2)
-plot(1:length(tout), obs_v(:, 2))
-%end_fnc;
+end_fnc;
