@@ -235,11 +235,7 @@ classdef Unicycle < Agent
             if (obj.task_op && t > obj.task) || ~obj.task_op
                 v = obj.Kv*(Fx*cos(obj.theta(t-1)) + Fy*sin(obj.theta(t-1)));
                 if obj.sat_op
-                    if v > obj.max_v
-                        v = obj.max_v;
-                    elseif v < -obj.max_v
-                        v = -obj.max_v;
-                    end
+                    v = max(min(v, obj.max_v), -obj.max_v);
                 end
             else
                 v = 0;

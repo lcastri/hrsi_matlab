@@ -52,20 +52,22 @@ for t = 2:length(tout)
 
     obs_x_disp = (r.x(t) - r.x(t-1))/ r.dt;
     obs_y_disp = (r.y(t) - r.y(t-1))/ r.dt;
-    obs_v(t, :) = [obs_x_disp obs_y_disp];
+    obs_v = [obs_x_disp obs_y_disp];
 
-    cross_prod = obs_v(t, 1)*v(2)-obs_v(t, 2)*v(1);
-    r.rel_angle(t-1, h.id) = wrapTo2Pi(atan2(cross_prod,dot(obs_v(t,:), v)));
+    cross_prod = obs_v(1)*v(2) - obs_v(2)*v(1);
+    r.rel_angle(t-1, h.id) = wrapTo2Pi(atan2(cross_prod,dot(obs_v, v)));
 
     data{5,1}.data(end+1,1) = r.rel_angle(t-1, h.id);
 
     estim_x_disp = norm(v) * cos(r.rel_angle(t-1, h.id)) * h.dt;
     estim_y_disp = norm(v) * sin(r.rel_angle(t-1, h.id)) * h.dt;
-    
-    estim_disp = invRotationMatrixZ(r.theta(t-1))*[estim_x_disp;estim_x_disp];
+
+    r.theta(t-1) = wrapTo2Pi(r.theta(t-1));
+    estim_disp = [estim_x_disp, estim_y_disp]*invRotationMatrixZ(r.theta(t-1));
 
     h.estim_x(t-1) = h.x(t-1) + estim_disp(1);  % New x-coordinate of point A
     h.estim_y(t-1) = h.y(t-1) + estim_disp(2);  % New y-coordinate of point A
+
 end
 
 end_fnc;

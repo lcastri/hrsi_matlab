@@ -9,7 +9,7 @@ function plot_situation_wGrid(makeVideo, video, r_id, A, t, ax)
 
     % Define the grid size and cell resolution
     grid_size = 8;  % 8m x 8m grid
-    cell_resolution = 1;  % 1m cell resolution
+    cell_resolution = 0.1;  % 1m cell resolution
 
     % Calculate the grid limits based on the center position
     x_min = A{r_id}.x(t) - grid_size / 2;
@@ -27,13 +27,13 @@ function plot_situation_wGrid(makeVideo, video, r_id, A, t, ax)
     hold on
 
     % Calculate the row and column of the corresponding cell
-    plot(A{r_id-1}.estim_x(t), A{r_id-1}.estim_y(t), '.', 'MarkerSize', 35, 'Color', 'c')
-    hold on
-    % row = round((A{r_id-1}.estim_y(t) - y_min) / cell_resolution) + 1;
-    % col = round((A{r_id-1}.estim_x(t) - x_min) / cell_resolution) + 1;
-    % if row > 0 && col > 0 && row < size(x,1) && col < size(x,2) && row < size(y,1) && col < size(y,2)
-    %     rectangle('Position', [x(row, col), y(row, col), cell_resolution, cell_resolution], 'FaceColor', 'm');
-    % end
+    % plot(A{r_id-1}.estim_x(t), A{r_id-1}.estim_y(t), '.', 'MarkerSize', 35, 'Color', 'c')
+    % hold on
+    row = round((A{r_id-1}.estim_y(t) - y_min) / cell_resolution) + 1;
+    col = round((A{r_id-1}.estim_x(t) - x_min) / cell_resolution) + 1;
+    if row > 0 && col > 0 && row < size(x,1) && col < size(x,2) && row < size(y,1) && col < size(y,2)
+        rectangle('Position', [x(row, col), y(row, col), cell_resolution, cell_resolution], 'FaceColor', 'm');
+    end
     % text(A{r_id}.x(t)+0.35, A{r_id}.y(t)+0.35, string(rad2deg(A{r_id}.rel_angle(t, r_id-1))), 'Color','m')
 
     
