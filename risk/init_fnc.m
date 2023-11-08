@@ -36,7 +36,9 @@ max_t = 5;
 environment;
 
 %% Noise definition
-% noise;
+mu = 0;
+sigma = 0.05; % [m]
+apply_noise = true;
 
 %% Agent definition
 % Goal
@@ -92,8 +94,8 @@ data{3,1}.data = [];
 data{4,1}.data = [];
 data{5,1}.data = [];
 
-data{1,1}.name = "d_rh";
+data{1,1}.name = "d_{rh}";
 data{2,1}.name = "v_r";  
 data{3,1}.name = "risk";
 data{4,1}.name = "v_h";
-data{5,1}.name = "\theta_rh";
+data{5,1}.name = "\theta_{rh}";

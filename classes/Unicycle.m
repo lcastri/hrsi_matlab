@@ -366,14 +366,7 @@ classdef Unicycle < Agent
                 obj.rel_angle(t, obs.id) = acos(cosine_angle);
             end
         end
-
-        function estimate_next_pos(obj, t)
-            x_disp = obj.v(t) * cos(obj.rel_angle(t)) * obj.dt;
-            y_disp = obj.v(t) * sin(obj.rel_angle(t)) * obj.dt;
-            obj.estim_x(t) = obj.x(t) + x_disp;  % New x-coordinate of point A
-            obj.estim_y(t) = obj.y(t) + y_disp;  % New y-coordinate of point A
-        end
-        
+       
         function [Ft, gFt] = total_force_field(obj, t)
             %total_force_field: compute attractive and repulsive forces
             % - param t: (int) time step
