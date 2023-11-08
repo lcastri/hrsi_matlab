@@ -85,12 +85,12 @@ classdef Unicycle < Agent
             hold on
 
             % draw id
-            text(obj.x(t)+0.35, obj.y(t), string(obj.id), 'Color','m')
-            hold on
+            % text(obj.x(t)+0.35, obj.y(t), string(obj.id), 'Color','m')
+            % hold on
 
             % draw orientation
             % quiver(obj.x(t), obj.y(t), obj.L*cos(obj.theta(t)), obj.L*sin(obj.theta(t)), 0, 'Color', obj.color, 'MaxHeadSize', 1);
-            % quiver(obj.x(t), obj.y(t), obj.v(t)*cos(obj.theta(t)), obj.v(t)*sin(obj.theta(t)), 0, 'Color', obj.color, 'MaxHeadSize', 1);
+            quiver(obj.x(t), obj.y(t), obj.v(t)*cos(obj.theta(t)), obj.v(t)*sin(obj.theta(t)), 0, 'Color', obj.color, 'MaxHeadSize', 1);
 
             hold on
 
@@ -209,14 +209,14 @@ classdef Unicycle < Agent
             end
         end
         
-        function compute_next_state(obj, t, DT)
+        function compute_next_state(obj, t)
             %compute_next_state: compute next state x,y,theta
             % - param t: (int) time step
             % - param DT: (float) delta time
             
-            obj.x(t) = obj.x(t-1) + DT*obj.v(t-1)*cos(obj.theta(t-1));
-            obj.y(t) = obj.y(t-1) + DT*obj.v(t-1)*sin(obj.theta(t-1));
-            obj.theta(t) = obj.theta(t-1) + DT*obj.w(t-1);
+            obj.x(t) = obj.x(t-1) + obj.dt*obj.v(t-1)*cos(obj.theta(t-1));
+            obj.y(t) = obj.y(t-1) + obj.dt*obj.v(t-1)*sin(obj.theta(t-1));
+            obj.theta(t) = wrapToPi(obj.theta(t-1) + obj.dt*obj.w(t-1));
         end
 
         function compute_v(obj, t, Ft, varargin)

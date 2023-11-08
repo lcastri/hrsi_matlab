@@ -17,7 +17,7 @@ for t = 2 : length(tout)
             end
         end
         U{i}.set_goal(G{current_goal}, t);
-        U{i}.compute_next_state(t, DT);
+        U{i}.compute_next_state(t);
     end
     
     for i = 1 : length(U)   
@@ -46,53 +46,37 @@ for t = 2 : length(tout)
 end
 
 for t = 2:length(tout)
-    x_disp = h.x(t) - h.x(t-1);
-    y_disp = h.y(t) - h.y(t-1);
-    v = [x_disp y_disp] / h.dt;
+    x_disp = (h.x(t) - h.x(t-1))/ h.dt;
+    y_disp = (h.y(t) - h.y(t-1))/ h.dt;
+    v = [x_disp y_disp];
 
-    obs_x_disp = r.x(t) - r.x(t-1);
-    obs_y_disp = r.y(t) - r.y(t-1);
-    obs_v = [obs_x_disp obs_y_disp] / r.dt;
+    obs_x_disp = (r.x(t) - r.x(t-1))/ r.dt;
+    obs_y_disp = (r.y(t) - r.y(t-1))/ r.dt;
+    obs_v(t, :) = [obs_x_disp obs_y_disp];
 
-    v=v * [1; 1i];
-    obs_v=obs_v* [1; 1i];
-    h.rel_angle(t-1, r.id) = angle(v*obs_v');
+    cross_prod = obs_v(t, 1)*v(2)-obs_v(t, 2)*v(1);
+    r.rel_angle(t-1, h.id) = wrapTo2Pi(atan2(cross_prod,dot(obs_v(t,:), v)));
 
-    % cross_prod = obs_x_disp*y_disp-obs_y_disp*x_disp;
-    % h.rel_angle(t-1, r.id) = wrapTo2Pi(atan2(abs(cross_prod),dot(obs_v, v)));
+    data{5,1}.data(end+1,1) = r.rel_angle(t-1, h.id);
 
-    % h.rel_angle(t-1, r.id) = (atan2(obs_y_disp, obs_x_disp) - atan2(y_disp(t), x_disp(t)));
-    % Adjust the sign of h.rel_angle to match the orientation of vectors
-    % if h.rel_angle(t-1, r.id) < -pi/2
-    %     h.rel_angle(t-1, r.id) = h.rel_angle(t-1, r.id) + pi;
-    % elseif h.rel_angle(t-1, r.id) > pi/2
-    %     h.rel_angle(t-1, r.id) = h.rel_angle(t-1, r.id) - pi;
-    % end
-
-    % % Compute the dot product of the two vectors
-    % dot_product = dot(v, obs_v);
-    % 
-    % % Compute the magnitudes of the vectors
-    % magn_v = norm(v);
-    % magn_obs_v = norm(obs_v);
-    % if magn_v < 0.05 || magn_obs_v < 0.05
-    %     h.rel_angle(t-1, r.id) = 0;
-    % else
-    %     % Compute the cosine of the angle between the vectors
-    %     cosine_angle = dot_product / (magn_v * magn_obs_v);
-    % 
-    %     % Compute the angle in radians
-    %     ciao = atan2(obs_y_disp, obs_x_disp) - atan2(y_disp, x_disp);
-    %     h.rel_angle(t-1, r.id) = acos(cosine_angle);
-    % end
-    data{5,1}.data(end+1,1) = h.rel_angle(t-1, r.id);
-
-    estim_x_disp = norm(v) * cos(h.rel_angle(t-1, r.id)) * h.dt;
-    estim_y_disp = norm(v) * sin(h.rel_angle(t-1, r.id)) * h.dt;
-
+    estim_x_disp = norm(v) * cos(r.rel_angle(t-1, h.id)) * h.dt;
+    estim_y_disp = norm(v) * sin(r.rel_angle(t-1, h.id)) * h.dt;
+    % obs_v(abs(obs_v) < 0.0001) = 0;
+    % I NEED A ROTATION MATRIX
+    if t<750
+        estim_x_disp = sign(obs_v(t,1))*estim_x_disp;
+        estim_y_disp = sign(obs_v(t,1))*estim_y_disp;
+    else
+        estim_x_disp = sign(obs_v(t,2))*estim_x_disp;
+        estim_y_disp = sign(obs_v(t,2))*estim_y_disp;
+    end
     h.estim_x(t-1) = h.x(t-1) + estim_x_disp;  % New x-coordinate of point A
     h.estim_y(t-1) = h.y(t-1) + estim_y_disp;  % New y-coordinate of point A
-    % h.estimate_next_pos(t);
 end
 
-end_fnc;
+figure
+subplot(2, 1, 1)
+plot(1:length(tout), obs_v(:, 1))
+subplot(2, 1, 2)
+plot(1:length(tout), obs_v(:, 2))
+%end_fnc;
