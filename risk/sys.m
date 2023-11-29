@@ -7,19 +7,19 @@ for t = 2 : length(tout)
         current_goal = U{i}.g_seq(t-1);
         U{i}.g_changed(t) = ~U{i}.g_changed(t-1) && U{i}.d_a(t-1, U{i}.g_seq(t-1)) <= dist_thres;
         if U{i} == r
-            if U{i}.g_changed(t)
-                current_goal = randi([2,5], 1);
-                % if current_goal + 1 <= length(G)
-                %     current_goal = current_goal + 1;
-                % else
-                %     current_goal = 1;
-                % end
+            if U{i}.g_changed(t-1)
+                % current_goal = randi(length(Goals_r))+size(Goals_h,1);
+                if t <= length(tout)/2
+                    current_goal = 3 - (current_goal ~= 2);
+                else
+                    current_goal = 5 - (current_goal ~= 4);
+                end
             end
         end
         U{i}.set_goal(G{current_goal}, t);
         U{i}.compute_next_state(t);
 
-        if apply_noise
+        if apply_noise && U{i}.id == r.id
             % Applying gaussian noise to the agent positions
             noise_x = mu + sigma*(2*rand-1); 
             noise_y = mu + sigma*(2*rand-1);
@@ -29,8 +29,15 @@ for t = 2 : length(tout)
     end
     
     for i = 1 : length(U)   
-        U{i}.measure_g(t);
-        U{i}.measure_obs(t);
+        if apply_noise && U{i}.id == r.id
+            U{i}.measure_g(t, 0.05 + sigma*(2*rand-1), 0);
+            U{i}.measure_obs(t,0.1 + sigma*(2*rand-1),0);
+
+            % U{i}.measure_obs(t, 0.075 + sigma*(2*rand-1), mu + sigma*(2*rand-1));
+        else
+            U{i}.measure_g(t);
+            U{i}.measure_obs(t);
+        end
         U{i}.measure_risk(t);
 
         %% VELOCITIES
@@ -48,7 +55,6 @@ for t = 2 : length(tout)
     data{2,1}.data(end+1,1) = r.v(t);
     data{3,1}.data(end+1,1) = h.risk(t);
     data{4,1}.data(end+1,1) = h.v(t);
-    data{6,1}.data(end+1,1) = r.d_a(t, r.g_seq(t));
 
 end
 

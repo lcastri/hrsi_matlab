@@ -37,7 +37,7 @@ environment;
 
 %% Noise definition
 mu = 0;
-sigma = 0.05; % [m]
+sigma = 0.075; % [m]
 apply_noise = true;
 
 %% Agent definition
@@ -69,7 +69,7 @@ n_a = 2;
 n_agent = 1 + length(Goals_r) + n_a;
 
 h = Unicycle(1+length(G), 'b', ...
-             0, Kr, eta_0, ...
+             0, 3*Kr, 2*eta_0, ...
              Gh{1}.x(1), Gh{1}.y(1), 0, ...
              tout, Rep_force.VORTEX, n_agent, L, ...
              sat_op, max_v, task_op, Kv, Kw, DT);
@@ -84,7 +84,8 @@ r.set_goal(Gr{1}, 1)
 
 %% Obstacle definition
 h.set_obs(r,1)
-U{1,1} = h; 
+U{1,1} = h;
+% r.set_obs(h,1)
 U{2,1} = r; 
 
 %% DATA
@@ -93,11 +94,10 @@ data{2,1}.data = [];
 data{3,1}.data = [];
 data{4,1}.data = [];
 data{5,1}.data = [];
-data{6,1}.data = [];
+
 
 data{1,1}.name = "d_{rh}";
 data{2,1}.name = "v_r";  
 data{3,1}.name = "risk";
 data{4,1}.name = "v_h";
 data{5,1}.name = "\theta_{rh}";
-data{6,1}.name = "d_{rg}";
