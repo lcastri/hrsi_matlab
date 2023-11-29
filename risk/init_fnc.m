@@ -28,7 +28,7 @@ L = 1.25;
 simulation_time = 150;
 tout = 0 : DT : simulation_time;
 dist_thres = 0.1;
-saturation_op = true;
+sat_op = true;
 sat_v = 1;
 max_v = 1.5;
 task_op = false;
@@ -72,14 +72,14 @@ h = Unicycle(1+length(G), 'b', ...
              0, Kr, eta_0, ...
              Gh{1}.x(1), Gh{1}.y(1), 0, ...
              tout, Rep_force.VORTEX, n_agent, L, ...
-             saturation_op, max_v, task_op, Kv, Kw, DT);
+             sat_op, max_v, task_op, Kv, Kw, DT);
 h.set_goal(Gh{1}, 1)
          
 r = Unicycle(2+length(G), 'r', ...
              0, Kr, eta_0, ...
              Gr{1}.x(1), Gr{1}.y(1), 0, ...
              tout, Rep_force.VORTEX, n_agent, L, ...
-             saturation_op, sat_v, task_op, Kv, Kw, DT);
+             sat_op, sat_v, task_op, Kv, Kw, DT);
 r.set_goal(Gr{1}, 1)
 
 %% Obstacle definition
@@ -93,9 +93,11 @@ data{2,1}.data = [];
 data{3,1}.data = [];
 data{4,1}.data = [];
 data{5,1}.data = [];
+data{6,1}.data = [];
 
 data{1,1}.name = "d_{rh}";
 data{2,1}.name = "v_r";  
 data{3,1}.name = "risk";
 data{4,1}.name = "v_h";
 data{5,1}.name = "\theta_{rh}";
+data{6,1}.name = "d_{rg}";

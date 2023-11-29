@@ -90,8 +90,8 @@ classdef Unicycle < Agent
 
             % draw orientation
             % quiver(obj.x(t), obj.y(t), obj.L*cos(obj.theta(t)), obj.L*sin(obj.theta(t)), 0, 'Color', obj.color, 'MaxHeadSize', 1);
+            % quiver(obj.x(t), obj.y(t), obj.v(t)*obj.dt*cos(obj.theta(t)), obj.v(t)*obj.dt*sin(obj.theta(t)), 0, 'Color', obj.color, 'MaxHeadSize', 1);
             quiver(obj.x(t), obj.y(t), obj.v(t)*cos(obj.theta(t)), obj.v(t)*sin(obj.theta(t)), 0, 'Color', obj.color, 'MaxHeadSize', 1);
-
             hold on
 
             % draw goal bearing
@@ -139,11 +139,12 @@ classdef Unicycle < Agent
             
             if ~isempty(obj.obs)
                 for o = obj.obs
-                    obj.risk_a(t, o.id) = exp(obj.v(t-1));
+                    % obj.risk_a(t, o.id) = exp(obj.v(t-1));
                     if obj.d_a(t-1, o.id) < obj.eta_0
                         [col, r] = obj.build_cone(o, t);
                         if col
-                            obj.risk_a(t, o.id) = obj.risk_a(t, o.id)*exp(r);
+                            % obj.risk_a(t, o.id) = obj.risk_a(t, o.id)*exp(r);
+                            obj.risk_a(t, o.id) = exp(r);
                         end
                         obj.collision_a(t, o.id) = col;
                     end
@@ -257,13 +258,14 @@ classdef Unicycle < Agent
             end
             Fx = Ft(1);
             Fy = Ft(2);
+            % w = (atan2(Fy, Fx) - obj.theta(t-1));
             if (obj.task_op && t > obj.task) || ~obj.task_op
                 nFt = sqrt(Fx^2+Fy^2);
                 t_a = atan2(Fy, Fx);
-                theta_d = obj.theta(t-1) - asin(sin(obj.theta(t-1) - t_a));
-        
-                first_term = -obj.Kw*(obj.theta(t-1) - theta_d)/(sign(cos(obj.theta(t-1) - t_a)));
-                if nFt ~= 0 
+
+                first_term = -obj.Kw*(asin(sin(obj.theta(t-1) - t_a)))/(sign(cos(obj.theta(t-1) - t_a)));
+                if nFt ~= 0
+                    % second_term = obj.v(t-1)/power(nFt,2)*([-Fy Fx] * gFt * [cos(obj.theta(t-1)); sin(obj.theta(t-1))]);
                     second_term = obj.v(t-1)/power(nFt,2)*([-Fy Fx] * gFt * [cos(obj.theta(t-1)); sin(obj.theta(t-1))]);
                 else
                     second_term = 0;

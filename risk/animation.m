@@ -21,7 +21,7 @@
 % end
 
 %% PLOT
-step = 1; % to change to speed up the video
+step = 3; % to change to speed up the video
 
 for t = 1 : step : length(tout)
     plot_situation_wGrid(false, 0, r.id, [G;U], t, axis_def)

@@ -5,6 +5,10 @@ d = datetime(t,'ConvertFrom','datenum');
 fprintf(fileID, "Simulation created on " + string(d) + "\n");
 fprintf(fileID, "\n");
 
+fprintf(fileID, "Description:\n");
+fprintf(fileID, description);
+fprintf(fileID, "\n\n");
+
 fprintf(fileID, "Virtual potential field parameters:\n");
 fprintf(fileID, "- Ka : %f\n", Ka);
 if exist('Kr','var') == 1
@@ -18,13 +22,9 @@ fprintf(fileID, "- Kw : %f\n", Kw);
 fprintf(fileID, "\n");
 
 fprintf(fileID, "Noise definition:\n");
-for i = 1 : length(N)
-    fprintf(fileID, N{i,1}.name + "\n");
-    fprintf(fileID, "- mean : %f\n", N{i,1}.mu);
-    fprintf(fileID, "- standard deviation : %f\n", N{i,1}.sigma);
-    fprintf(fileID, "\n");
-end
-
+fprintf(fileID, "- mean : %f\n", mu);
+fprintf(fileID, "- standard deviation : %f\n", sigma);
+fprintf(fileID, "\n");
 
 fprintf(fileID, "Simulation parameters:\n");
 fprintf(fileID, "- sampling time [s]: %f\n", DT);

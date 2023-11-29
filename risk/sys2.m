@@ -7,13 +7,12 @@ for t = 2 : length(tout)
         current_goal = U{i}.g_seq(t-1);
         U{i}.g_changed(t) = ~U{i}.g_changed(t-1) && U{i}.d_a(t-1, U{i}.g_seq(t-1)) <= dist_thres;
         if U{i} == r
-            if U{i}.g_changed(t)
-                current_goal = randi([2,5], 1);
-                % if current_goal + 1 <= length(G)
-                %     current_goal = current_goal + 1;
-                % else
-                %     current_goal = 1;
-                % end
+            if U{i}.g_changed(t-1)
+                if t <= length(tout)/2
+                    current_goal = 3 - (current_goal ~= 2);
+                else
+                    current_goal = 5 - (current_goal ~= 4);
+                end
             end
         end
         U{i}.set_goal(G{current_goal}, t);

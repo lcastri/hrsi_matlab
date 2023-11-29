@@ -34,7 +34,7 @@ function plot_situation_wGrid(makeVideo, video, r_id, A, t, ax)
     if row > 0 && col > 0 && row < size(x,1) && col < size(x,2) && row < size(y,1) && col < size(y,2)
         rectangle('Position', [x(row, col), y(row, col), cell_resolution, cell_resolution], 'FaceColor', 'm');
     end
-    % text(A{r_id}.x(t)+0.35, A{r_id}.y(t)+0.35, string(rad2deg(A{r_id}.rel_angle(t, r_id-1))), 'Color','m')
+    text(A{r_id}.x(t)+0.35, A{r_id}.y(t)+0.35, string(rad2deg(A{r_id}.rel_angle(t, r_id-1))), 'Color','m')
 
     
     % draw agents
