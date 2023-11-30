@@ -5,7 +5,7 @@ clc
 %% Add utilities folder
 currentFolder = pwd;
 currentFolder_splitted = string(strsplit(currentFolder, '/'));
-projectFolder_index = find(strcmp(currentFolder_splitted, 'hrsi'));
+projectFolder_index = find(strcmp(currentFolder_splitted, 'hrsi_matlab'));
 env_path = strjoin(currentFolder_splitted(1, 1:projectFolder_index), '/');
 addpath(genpath(env_path + '/utilities'))
 addpath(genpath(env_path + '/classes'))
@@ -21,17 +21,20 @@ Kw = 3;
 %% Init data definition
 DT = 0.1;
 L = 1.25;
-simulation_time = 300;
+simulation_time = 150;
 tout = 0 : DT : simulation_time;
-dist_thres = 0.01;
+dist_thres = 0.3;
 sat_op = true;
 max_v = 1.75;
-task_op = true;
+task_op = false;
 max_t = 15;
 environment;
 
 %% Noise definition
-noise;
+% noise;
+apply_noise = false;
+mu = 0;
+sigma = 0.05;
 
 %% Goals
 G = {};
@@ -43,20 +46,33 @@ G{1,1} = g1;
 
 g2 = Agent(2, 'k', ...
            Ka, 0, 0, ...
-           -1, -4, 0, ...
+           -9.4, 0, 0, ...
            tout, 0);
 G{2,1} = g2;
 
 g3 = Agent(3, 'k', ...
            Ka, 0, 0, ...
-           9.4, 4.2, 0, ...
+           -1, -4, 0, ...
            tout, 0);
 G{3,1} = g3;
 
+g4 = Agent(4, 'k', ...
+           Ka, 0, 0, ...
+           9.4, -4, 0, ...
+           tout, 0);
+G{4,1} = g4;
+
+g5 = Agent(5, 'k', ...
+           Ka, 0, 0, ...
+           9.4, 4.2, 0, ...
+           tout, 0);
+G{5,1} = g5;
+
+
 %% Agent definition
-n_agent = 4;
+n_agent = size(G,1) + 1;
 U = {};
-u1 = Unicycle(4, 'r', ...
+u1 = Unicycle(size(G,1) + 1, 'r', ...
               0, 0, 0, ...
               g1.x(1), g1.y(1), -pi/2, ...
               tout, 0, n_agent, L, ...

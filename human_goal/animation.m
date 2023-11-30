@@ -21,7 +21,7 @@ switch answer
 end
 
 %% PLOT
-step = 1; % to change to speed up the video
+step = 10; % to change to speed up the video
 
 for t = 1 : step : length(tout)
     plot_situation(makeVideo, video, boundaries, [G;U], t, axis_def)

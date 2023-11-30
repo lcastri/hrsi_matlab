@@ -1,4 +1,4 @@
-classdef Noise    
+classdef myNoise    
     properties
         name
         mu
@@ -7,7 +7,7 @@ classdef Noise
     end
     
     methods
-        function obj = Noise(tout, name, mu, sigma)
+        function obj = myNoise(tout, name, mu, sigma)
             %Noise: class constructor
             % - param tout: (array) time vector
             % - param name: (string) name associated to this noise
