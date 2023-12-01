@@ -21,8 +21,9 @@ Kw = 3;
 %% Init data definition
 DT = 0.1;
 L = 1.25;
-simulation_time = 150;
-tout = 0 : DT : simulation_time;
+desired_ts_length = 2048;
+simulation_time = desired_ts_length*0.1;
+tout = 0 : DT : simulation_time-DT;
 dist_thres = 0.3;
 sat_op = true;
 max_v = 1.75;
@@ -32,7 +33,7 @@ environment;
 
 %% Noise definition
 % noise;
-apply_noise = false;
+apply_noise = true;
 mu = 0;
 sigma = 0.05;
 
